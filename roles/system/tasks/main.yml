@@ -1,0 +1,78 @@
+# ロケール事前確認
+- name: check locale
+  shell: localectl status
+  register: check_localectl_result
+  check_mode: no
+  changed_when: false
+
+# ロケール設定
+- name: set locale
+  shell: localectl set-locale LANG=ja_JP.utf8
+  when: "'LANG=ja_JP.utf8' not in check_localectl_result.stdout"
+
+# タイムゾーン設定（タイムゾーンがUTCになっているのでJSTに変更が必要。そうしないと録音のタイミングが狂う）
+- name: set timezone to Asia/Tokyo
+  timezone:
+    name: Asia/Tokyo
+
+
+# パッケージアップデート
+- name: yum updade
+  yum: name=* state=latest
+
+
+# パッケージインストール
+- name: yum install
+  yum:
+    name: "{{packages}}"
+  vars:
+    packages:
+      - git
+      - golang
+
+# docker-composeのインストール
+- name: yum install docker-ce
+  yum:
+    name: docker
+    state: latest
+
+# dockerサービスの起動
+- name: start & enable docker service
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+
+# docker-composeのインストール
+- name: docker-compose1.29.2のインストール（バージョンは固定している）
+  get_url:
+    url:  "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64"
+    dest: "/usr/bin/docker-compose"
+    mode: +x
+  become: yes
+
+# アプリをgit clone
+- name: git clone
+  ansible.builtin.git:
+    repo: https://github.com/sankaku/docker_rec_radiko.git
+    dest: /home/ec2-user/docker_rec_radiko
+
+
+# dockerコンテナのbuild
+# （ansibleのdockerコマンドをインストールできないのでshellモジュールで代替する）
+- name: docker build docker_rec_radiko
+  shell:
+    cmd: 'docker build . -t docker_rec_radiko'
+    chdir: /home/ec2-user/docker_rec_radiko
+  register: result_shell
+- debug: var=result_shell
+
+# cron設定　ここでは例として毎日17:55からTBSのラジオ番組を録音するようにしている
+# cron確認は’sudo crontab -l’のようにsudoをつけて確認すること
+- name: cron setting
+  cron:
+    name: After6Junction
+    minute: '55'
+    hour: "17"
+    job: '/home/ec2-user/docker_rec_radiko/radiko_docker_run.sh TBS 190 /home/ec2-user/docker_rec_radiko/ After6Junction'
+    state: present
