@@ -15,7 +15,6 @@
   timezone:
     name: Asia/Tokyo
 
-
 # パッケージアップデート
 - name: yum updade
   yum: name=* state=latest
