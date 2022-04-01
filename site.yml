@@ -1,5 +1,5 @@
+---
 - hosts: targethost
   roles:
     - system
     - get_info
-
