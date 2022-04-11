@@ -11,7 +11,7 @@ platforms:
     command: /sbin/init
 
   - name: instance2
-    image: docker.io/centos:8
+    image: amazonlinux
     pre_build_image: true
     privileged: True
     command: /sbin/init
