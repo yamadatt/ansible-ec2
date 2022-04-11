@@ -1,9 +1,6 @@
 ---
 dependency:
   name: galaxy
-lint: |
-  yamllint .
-  ansible-lint .
 driver:
   name: docker
 platforms:
