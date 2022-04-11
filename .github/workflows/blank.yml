@@ -33,4 +33,4 @@ jobs:
 
       - name: Test with molecule
         run: |
-          molecule --debug syntax
+          molecule test
