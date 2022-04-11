@@ -32,4 +32,4 @@ jobs:
 
       - name: Test with molecule
         run: |
-          cd roles ; molecule test
+          cd ansible-ec2 ; molecule test
