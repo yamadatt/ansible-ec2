@@ -11,7 +11,7 @@ platforms:
     command: /sbin/init
 
   - name: instance2
-    image: amazonlinux
+    image: amazonlinux:latest
     pre_build_image: true
     privileged: True
     command: /sbin/init
