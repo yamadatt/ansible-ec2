@@ -17,12 +17,12 @@
 
 # パッケージアップデート
 - name: yum updade
-  yum: name=* state=latest
+  ansible.builtin.yum: name=* state=latest
 
 
 # パッケージインストール
 - name: yum install
-  yum:
+  ansible.builtin.yum:
     name: "{{packages}}"
   vars:
     packages:
@@ -31,7 +31,7 @@
 
 # docker-composeのインストール
 - name: yum install docker-ce
-  yum:
+  ansible.builtin.yum:
     name: docker
     state: latest
 
