@@ -4,7 +4,8 @@
   register: check_localectl_result
   check_mode: no
   changed_when: false
-  always_run: yes
+  when: check_localectl_result is undefined
+
 
 # ロケール設定
 - name: set locale
