@@ -6,7 +6,7 @@
   register: result
 
 - name: debug
-  debug: 
+  debug:
     msg: "{{ result }}"
 
 - name: information

@@ -4,6 +4,7 @@
   register: check_localectl_result
   check_mode: no
   changed_when: false
+  always_run: yes
 
 # ロケール設定
 - name: set locale
