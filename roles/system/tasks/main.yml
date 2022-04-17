@@ -4,7 +4,7 @@
   register: check_localectl_result
   check_mode: no
   changed_when: false
-  when: check_localectl_result is undefined
+  when: not check_localectl_result
 
 
 # ロケール設定
