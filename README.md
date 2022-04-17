@@ -62,7 +62,10 @@ ansible 2.10.9
 
 以下のコマンドで動く。
 
-```
-ansible-playbook -i hosts site.yml
-```
+  ansible-playbook -i hosts site.yml
 
+### 構文チェック（テスト）
+
+PlaybookがYAMLとして正しく解釈できるか、存在しないモジュールを使用していないかは、以下のように```--syntax-check```をつけて実行する。
+
+  ansible-playbook -i hosts site.yml --syntax-check
