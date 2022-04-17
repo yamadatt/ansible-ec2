@@ -23,7 +23,7 @@
 # パッケージインストール
 - name: yum install
   ansible.builtin.yum:
-    name: "{{packages}}"
+    name: "{{ packages }}"
   vars:
     packages:
       - git
