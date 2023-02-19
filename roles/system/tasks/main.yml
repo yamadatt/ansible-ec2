@@ -1,17 +1,18 @@
+---
 # ロケール事前確認
 - name: check locale
   ansible.builtin.shell: localectl status
   register: check_localectl_result
   check_mode: no
   changed_when: false
-
+  when: ansible_facts['os_family'] == "RedHat"
 
 # ロケール設定
 - name: set locale
   ansible.builtin.shell: localectl set-locale LANG=ja_JP.utf8
   when: "'LANG=ja_JP.utf8' not in check_localectl_result.stdout"
 
-# タイムゾーン設定（タイムゾーンがUTCになっているのでJSTに変更が必要。そうしないと録音のタイミングが狂う）
+# タイムゾーン設定
 - name: set timezone to Asia/Tokyo
   ansible.builtin.timezone:
     name: Asia/Tokyo
@@ -19,7 +20,6 @@
 # パッケージアップデート
 - name: yum updade
   ansible.builtin.yum: name=* state=latest
-
 
 # パッケージインストール
 - name: yum install
@@ -65,7 +65,10 @@
     cmd: 'docker build . -t docker_rec_radiko'
     chdir: /home/ec2-user/docker_rec_radiko
   register: result_shell
-- debug: var=result_shell
+
+
+- name: output shell resutl
+  ansible.builtin.debug: var=result_shell
 
 # cron設定　ここでは例として毎日17:55からTBSのラジオ番組を録音するようにしている
 # cron確認は’sudo crontab -l’のようにsudoをつけて確認すること

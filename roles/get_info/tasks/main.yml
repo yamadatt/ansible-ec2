@@ -1,16 +1,6 @@
 # 各種情報の出力
-
-
-- name: ping
-  ping:
-  register: result
-
-- name: debug
-  debug:
-    msg: "{{ result }}"
-
 - name: information
-  shell: "{{ item }}"
+  ansible.builtin.command: "{{ item }}"
   with_items:
     - 'hostname'
     - 'uname -a'
@@ -18,6 +8,8 @@
     - "docker-compose --version"
     - "yum list installed"
   register: result
+  changed_when: false
 
-- debug: var="result.results.{{ item }}.stdout_lines"
+- name: output information
+  ansible.builtin.debug: var="result.results.{{ item }}.stdout_lines"
   with_sequence: start=0 end=4
