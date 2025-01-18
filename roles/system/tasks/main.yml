@@ -29,6 +29,7 @@
     packages:
       - git
       - golang
+      - cronie
 
 # docker-composeのインストール
 - name: yum install docker-ce
@@ -44,9 +45,9 @@
     enabled: yes
 
 # docker-composeのインストール
-- name: docker-compose1.29.2のインストール（バージョンは固定している）
+- name: docker-compose2.32.4のインストール（バージョンは固定している）
   ansible.builtin.get_url:
-    url: "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64"
+    url: "https://github.com/docker/compose/releases/download/v2.32.4/docker-compose-Linux-x86_64"
     dest: "/usr/bin/docker-compose"
     mode: +x
   become: yes

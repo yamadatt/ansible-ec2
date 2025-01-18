@@ -10,57 +10,48 @@ EC2でラジオのリアルタイム録音をするためのansible
 
 初期設定対象のサーバ（ターゲットのーど）はEC2で作成し、sshでログインできる状態にしておく。
 
-## IPアドレスの書き換え
+### 事前設定
 
-対象ホストのIPアドレス書き換える。
+以下を書き換える。
 
-EC2はIPアドレスがその都度変わるため、ターゲットサーバのIPアドレスを書き換える
 
-## 鍵のファイルパス書き換え
-
-鍵ペアのファイルを以下で設定した場所に格納する。
-
-下の例だと、```/etc/ansible/pemfile/radio.pem```
+[hosts](./hosts)
 
 ```
-ansible_ssh_private_key_file=/etc/ansible/pemfile/radio.pem
+[targethost]
+3.113.9.172　←　構築時に払い出されたIPアドレスに変更する
+
+[targethost:vars]
+ansible_ssh_port=22
+ansible_ssh_user=ec2-user
+ansible_ssh_private_key_file=/ansible/radio.pem　←　必要に応じて書き換える
+ansible_become=yes
+host_key_checking=False
 ```
 
-## playbook概要
 
-以下のようなことを実施する。
-
-* パッケージの最新化
-* git、dockerのインストール
-* タイムゾーンの変更
-* dockerファイルのダウンドーロ
-* docker build
-* cron設定
 
 ## 環境
 
-動作確認をした環境は以下。
+ansible用のコンテナーにアタッチして、コンテ上でansibleコマンドを使用する。
 
+### ansibleの準備
 
-OS：CentOS 7.4
+可能な限りボータビリティを持たせ、再現性を高めるため、dockerによりansiblを起動するようにしている。
 
-ansibleバージョン
+dockerイメージのbuild。
 
-```
-$ ansible --version
-ansible 2.10.9
-  config file = None
-  configured module search path = ['/root/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
-  ansible python module location = /usr/local/lib/python3.6/site-packages/ansible
-  executable location = /usr/local/bin/ansible
-  python version = 3.6.8 (default, Aug 24 2020, 17:57:11) [GCC 8.3.1 20191121 (Red Hat 8.3.1-5)]
-```
+    sudo docker build . -t ansible
 
-## 使い方
+### コンテナーにアタッチ
+
+カレントディレクトリをマウントしてコンテナーを起動する。と、同時にコンテナーにアタッチする。
+
+    docker run --rm -it -v $(pwd):/ansible ansible bash
 
 ### コマンド
 
-以下のコマンドで動く。
+コンテナーにアタッチした状態で以下のコマンドで動く。
 
   ansible-playbook -i hosts site.yml
 
@@ -69,3 +60,4 @@ ansible 2.10.9
 PlaybookがYAMLとして正しく解釈できるか、存在しないモジュールを使用していないかは、以下のように```--syntax-check```をつけて実行する。
 
   ansible-playbook -i hosts site.yml --syntax-check
+
