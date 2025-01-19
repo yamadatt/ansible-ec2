@@ -1,28 +1,29 @@
 ---
 # ロケール事前確認
-- name: check locale
-  ansible.builtin.shell: localectl status
+- name: Check locale
+  ansible.builtin.command:
+    cmd: localectl status
   register: check_localectl_result
-  check_mode: no
+  check_mode: false
   changed_when: false
   when: ansible_facts['os_family'] == "RedHat"
 
 # ロケール設定
-- name: set locale
+- name: Set locale
   ansible.builtin.shell: localectl set-locale LANG=ja_JP.utf8
   when: "'LANG=ja_JP.utf8' not in check_localectl_result.stdout"
 
 # タイムゾーン設定
-- name: set timezone to Asia/Tokyo
-  ansible.builtin.timezone:
+- name: Set timezone to Asia/Tokyo
+  community.general.timezone:
     name: Asia/Tokyo
 
 # パッケージアップデート
-- name: yum updade
+- name: Yum updade
   ansible.builtin.yum: name=* state=latest
 
 # パッケージインストール
-- name: yum install
+- name: Yum install
   ansible.builtin.yum:
     name: "{{ packages }}"
   vars:
@@ -32,20 +33,20 @@
       - cronie
 
 # docker-composeのインストール
-- name: yum install docker-ce
+- name: Yum install docker-ce
   ansible.builtin.yum:
     name: docker
     state: latest
 
 # dockerサービスの起動
-- name: start & enable docker service
+- name: Start & enable docker service
   ansible.builtin.systemd:
     name: docker
     state: started
     enabled: yes
 
 # docker-composeのインストール
-- name: docker-compose2.32.4のインストール（バージョンは固定している）
+- name: Docker-compose2.32.4のインストール（バージョンは固定している）
   ansible.builtin.get_url:
     url: "https://github.com/docker/compose/releases/download/v2.32.4/docker-compose-Linux-x86_64"
     dest: "/usr/bin/docker-compose"
@@ -53,7 +54,7 @@
   become: yes
 
 # アプリをgit clone
-- name: git clone
+- name: Git clone
   ansible.builtin.git:
     repo: https://github.com/sankaku/docker_rec_radiko.git
     dest: /home/ec2-user/docker_rec_radiko
@@ -61,19 +62,19 @@
 
 # dockerコンテナのbuild
 # （ansibleのdockerコマンドをインストールできないのでshellモジュールで代替する）
-- name: docker build docker_rec_radiko
+- name: Docker build docker_rec_radiko
   ansible.builtin.shell:
     cmd: 'docker build . -t docker_rec_radiko'
     chdir: /home/ec2-user/docker_rec_radiko
   register: result_shell
 
 
-- name: output shell resutl
+- name: Output shell resutl
   ansible.builtin.debug: var=result_shell
 
 # cron設定　ここでは例として毎日17:55からTBSのラジオ番組を録音するようにしている
 # cron確認は’sudo crontab -l’のようにsudoをつけて確認すること
-- name: cron setting
+- name: Cron setting
   ansible.builtin.cron:
     name: After6Junction
     minute: '55'
