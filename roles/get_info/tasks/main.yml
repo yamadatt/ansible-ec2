@@ -1,5 +1,5 @@
 # 各種情報の出力
-- name: information
+- name: Information
   ansible.builtin.command: "{{ item }}"
   with_items:
     - 'hostname'
@@ -10,6 +10,7 @@
   register: result
   changed_when: false
 
-- name: output information
-  ansible.builtin.debug: var="result.results.{{ item }}.stdout_lines"
-  with_sequence: start=0 end=4
+- name: Output information
+  ansible.builtin.debug:
+    var: "result.results[item].stdout_lines"
+  loop: "{{ range(0, 5) | list }}"
