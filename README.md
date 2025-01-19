@@ -59,5 +59,6 @@ dockerイメージのbuild。
 
 PlaybookがYAMLとして正しく解釈できるか、存在しないモジュールを使用していないかは、以下のように```--syntax-check```をつけて実行する。
 
-  ansible-playbook -i hosts site.yml --syntax-check
-
+```bash
+ansible-playbook -i hosts site.yml --syntax-check
+```
