@@ -10,7 +10,8 @@
 
 # ロケール設定
 - name: Set locale
-  ansible.builtin.shell: localectl set-locale LANG=ja_JP.utf8
+  ansible.builtin.command:
+    cmd: localectl set-locale LANG=ja_JP.utf8
   when: "'LANG=ja_JP.utf8' not in check_localectl_result.stdout"
 
 # タイムゾーン設定
@@ -20,7 +21,9 @@
 
 # パッケージアップデート
 - name: Yum updade
-  ansible.builtin.yum: name=* state=latest
+  ansible.builtin.yum:
+    name: "*"
+    state: present
 
 # パッケージインストール
 - name: Yum install
@@ -36,22 +39,22 @@
 - name: Yum install docker-ce
   ansible.builtin.yum:
     name: docker
-    state: latest
+    state: present
 
 # dockerサービスの起動
 - name: Start & enable docker service
   ansible.builtin.systemd:
     name: docker
     state: started
-    enabled: yes
+    enabled: true
 
 # docker-composeのインストール
 - name: Docker-compose2.32.4のインストール（バージョンは固定している）
   ansible.builtin.get_url:
     url: "https://github.com/docker/compose/releases/download/v2.32.4/docker-compose-Linux-x86_64"
     dest: "/usr/bin/docker-compose"
-    mode: +x
-  become: yes
+    mode: "u+x,g+x,o+x"
+  become: true
 
 # アプリをgit clone
 - name: Git clone
@@ -67,10 +70,13 @@
     cmd: 'docker build . -t docker_rec_radiko'
     chdir: /home/ec2-user/docker_rec_radiko
   register: result_shell
+  args:
+    creates: /home/ec2-user/docker_rec_radiko/Dockerfile
 
 
 - name: Output shell resutl
-  ansible.builtin.debug: var=result_shell
+  ansible.builtin.debug:
+    msg: "{{ result_shell }}"
 
 # cron設定　ここでは例として毎日17:55からTBSのラジオ番組を録音するようにしている
 # cron確認は’sudo crontab -l’のようにsudoをつけて確認すること

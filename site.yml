@@ -1,5 +1,6 @@
 ---
-- hosts: targethost
+- name: Apply roles to targethost
+  hosts: targethost
   roles:
     - system
     - get_info
