@@ -5,23 +5,25 @@
   hosts: all
   tasks:
     - name: "Block of checks"
-      ignore_errors: yes
       block:
         - name: "Httpdパッケージの存在を確認する"
           ansible.builtin.yum:
             list: httpd
           register: result_rpm
+          failed_when: result_rpm.rc != 0
 
         - name: "Httpdプロセスが起動していることを確認する"
           ansible.builtin.shell: "ps -ef | grep http[d]"
           register: result_proc
           changed_when: false
+          failed_when: result_proc.rc != 0
 
         - name: "Httpdサービスが自動起動になっているかを確認する"
           ansible.builtin.systemd:
             name: httpd
             enabled: true
           register: result_enabled
+          failed_when: result_enabled.state != 'enabled'
 
     - name: "結果をまとめて確認する"
       ansible.builtin.assert:

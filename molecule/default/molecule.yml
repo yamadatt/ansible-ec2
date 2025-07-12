@@ -7,13 +7,13 @@ platforms:
   - name: instance1
     image: docker.io/centos:7
     pre_build_image: true
-    privileged: True
+    privileged: true
     command: /sbin/init
 
   - name: instance2
     image: amazonlinux:latest
     pre_build_image: true
-    privileged: True
+    privileged: true
     command: /sbin/init
 
 provisioner:
