@@ -7,29 +7,29 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.8]
+        python-version: ['3.11']
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-        # キャッシュを活用
-      - uses: actions/cache@v2
+
+      - name: Cache pip packages
+        uses: actions/cache@v4
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
       - name: Install dependencies
         run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install ansible
-          python3 -m pip install "molecule[lint]"
-          python3 -m pip install "molecule[docker]"
-#          python3 -m pip install "molecule[docker,lint]"
+          python -m pip install --upgrade pip
+          python -m pip install ansible-core
+          python -m pip install "molecule[docker,lint]"
 
       - name: Test with molecule
         run: |
