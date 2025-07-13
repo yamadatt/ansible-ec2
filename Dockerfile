@@ -1,8 +1,5 @@
 FROM ubuntu:24.04
 
-# Labels.
-LABEL maintainer="yamadatt@gmail.com"
-
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
     apt-get install -y gnupg2 python3-pip python3-venv sshpass git openssh-client && \
     rm -rf /var/lib/apt/lists/* && \
