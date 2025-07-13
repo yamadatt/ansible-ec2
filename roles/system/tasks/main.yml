@@ -27,7 +27,7 @@
 
 # パッケージインストール
 - name: Yum install
-  ansible.builtin.yum:
+  ansible.builtin.dnf:
     name: "{{ packages }}"
   vars:
     packages:
