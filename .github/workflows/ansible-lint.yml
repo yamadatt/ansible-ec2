@@ -27,6 +27,5 @@ jobs:
 
       - name: Run ansible-lint
         run: |
-          cd ansible-ec2
           ansible-lint --force-color
         continue-on-error: true

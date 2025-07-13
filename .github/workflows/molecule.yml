@@ -36,7 +36,6 @@ jobs:
 
     - name: Run Molecule tests
       run: |
-        cd ansible-ec2
         molecule test
       env:
         PY_COLORS: '1'
@@ -65,7 +64,6 @@ jobs:
 
     - name: Run ansible-lint
       run: |
-        cd ansible-ec2
         ansible-lint --force-color
       continue-on-error: true  # ansible-lintエラーでもCIを止めない
 
@@ -88,6 +86,5 @@ jobs:
 
     - name: Run security scan with ansible-playbook --check
       run: |
-        cd ansible-ec2
         ansible-playbook --check --diff site.yml -i hosts
       continue-on-error: true
