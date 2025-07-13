@@ -1,41 +1,76 @@
 ---
-# This is httpd install playbook to execute Ansible tests.
+# This is a verification playbook for system and get_info roles
 
 - name: Verify
   hosts: all
+  gather_facts: true
   tasks:
-    - name: "Block of checks"
-      block:
-        - name: "Httpdパッケージの存在を確認する"
-          ansible.builtin.package_facts:
-            manager: auto
-          register: result_rpm
+    - name: "Check if required packages are installed"
+      ansible.builtin.package_facts:
+        manager: auto
+      register: package_facts
 
-        - name: "Check if apache2 is installed"
-          ansible.builtin.assert:
-            that:
-              - "'apache2' in ansible_facts.packages"
-            fail_msg: "Apache2 is not installed"
-
-        - name: "Check if apache2 process exists"
-          ansible.builtin.shell: "ps -ef | grep apache2 | grep -v grep || echo 'apache2 not running'"
-          register: result_proc
-          changed_when: false
-          failed_when: false
-
-        - name: "Httpdサービスが自動起動になっているかを確認する"
-          ansible.builtin.systemd:
-            name: httpd
-            enabled: true
-          register: result_enabled
-          failed_when: result_enabled.state != 'enabled'
-
-    - name: "結果をまとめて確認する"
+    - name: "Verify git is installed"
       ansible.builtin.assert:
-        that: "{{ result.failed == false }}"
-      loop:
-        - "{{ result_rpm }}"
-        - "{{ result_proc }}"
-        - "{{ result_enabled }}"
-      loop_control:
-        loop_var: result
+        that:
+          - "'git' in ansible_facts.packages"
+        fail_msg: "Git package is not installed"
+
+    - name: "Verify golang is installed"
+      ansible.builtin.assert:
+        that:
+          - "'golang' in ansible_facts.packages or 'go' in ansible_facts.packages"
+        fail_msg: "Golang package is not installed"
+
+    - name: "Verify docker is installed"
+      ansible.builtin.assert:
+        that:
+          - "'docker' in ansible_facts.packages or 'docker-ce' in ansible_facts.packages"
+        fail_msg: "Docker package is not installed"
+
+    - name: "Check if docker service is running"
+      ansible.builtin.service_facts:
+      register: service_facts
+
+    - name: "Verify docker service is enabled and running"
+      ansible.builtin.assert:
+        that:
+          - "ansible_facts.services['docker.service'].state == 'running'"
+          - "ansible_facts.services['docker.service'].status == 'enabled'"
+        fail_msg: "Docker service is not running or not enabled"
+
+    - name: "Check if timezone is set to Asia/Tokyo"
+      ansible.builtin.command:
+        cmd: timedatectl show --property=Timezone --value
+      register: timezone_result
+      changed_when: false
+
+    - name: "Verify timezone is Asia/Tokyo"
+      ansible.builtin.assert:
+        that:
+          - "timezone_result.stdout == 'Asia/Tokyo'"
+        fail_msg: "Timezone is not set to Asia/Tokyo"
+
+    - name: "Check if docker-compose exists"
+      ansible.builtin.stat:
+        path: /usr/bin/docker-compose
+      register: docker_compose_stat
+
+    - name: "Verify docker-compose is installed"
+      ansible.builtin.assert:
+        that:
+          - docker_compose_stat.stat.exists
+          - docker_compose_stat.stat.executable
+        fail_msg: "Docker-compose is not installed or not executable"
+
+    - name: "Check if cloned repository exists"
+      ansible.builtin.stat:
+        path: /home/ec2-user/docker_rec_radiko
+      register: repo_stat
+
+    - name: "Verify repository was cloned"
+      ansible.builtin.assert:
+        that:
+          - repo_stat.stat.exists
+          - repo_stat.stat.isdir
+        fail_msg: "Repository was not cloned successfully"

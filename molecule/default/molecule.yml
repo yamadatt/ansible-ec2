@@ -5,17 +5,22 @@ driver:
   name: docker
 platforms:
   - name: instance1
-    image: geerlingguy/docker-ubuntu2204-ansible:latest
+    image: geerlingguy/docker-centos8-ansible:latest
     pre_build_image: true
     privileged: true
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     cgroupns_mode: host
+    command: /lib/systemd/systemd
 
 provisioner:
   name: ansible
   config_options:
     defaults:
-      roles_path: ../../roles
+      roles_path: ../roles
+  inventory:
+    host_vars:
+      instance1:
+        ansible_python_interpreter: /usr/bin/python3
 verifier:
   name: ansible

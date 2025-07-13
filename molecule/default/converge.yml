@@ -3,20 +3,12 @@
   hosts: all
   become: true
   tasks:
-    - name: Update apt cache (Ubuntu)
-      ansible.builtin.apt:
-        update_cache: yes
-      when: ansible_os_family == "Debian"
+    - name: Include get_info role
+      include_role:
+        name: get_info
+      tags: get_info
 
-    - name: Install httpd (Ubuntu)
-      ansible.builtin.apt:
-        name: apache2
-        state: present
-      when: ansible_os_family == "Debian"
-
-    - name: Start apache2 service
-      ansible.builtin.service:
-        name: apache2
-        state: started
-      when: ansible_os_family == "Debian"
-      ignore_errors: true
+    - name: Include system role
+      include_role:
+        name: system
+      tags: system
