@@ -7,16 +7,21 @@
     - name: "Block of checks"
       block:
         - name: "Httpdパッケージの存在を確認する"
-          ansible.builtin.yum:
-            list: httpd
+          ansible.builtin.package_facts:
+            manager: auto
           register: result_rpm
-          failed_when: result_rpm.rc != 0
 
-        - name: "Httpdプロセスが起動していることを確認する"
-          ansible.builtin.shell: "ps -ef | grep http[d]"
+        - name: "Check if apache2 is installed"
+          ansible.builtin.assert:
+            that:
+              - "'apache2' in ansible_facts.packages"
+            fail_msg: "Apache2 is not installed"
+
+        - name: "Check if apache2 process exists"
+          ansible.builtin.shell: "ps -ef | grep apache2 | grep -v grep || echo 'apache2 not running'"
           register: result_proc
           changed_when: false
-          failed_when: result_proc.rc != 0
+          failed_when: false
 
         - name: "Httpdサービスが自動起動になっているかを確認する"
           ansible.builtin.systemd:

@@ -5,18 +5,17 @@ driver:
   name: docker
 platforms:
   - name: instance1
-    image: docker.io/centos:7
+    image: geerlingguy/docker-ubuntu2204-ansible:latest
     pre_build_image: true
     privileged: true
-    command: /sbin/init
-
-  - name: instance2
-    image: amazonlinux:latest
-    pre_build_image: true
-    privileged: true
-    command: /sbin/init
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    cgroupns_mode: host
 
 provisioner:
   name: ansible
+  config_options:
+    defaults:
+      roles_path: ../../roles
 verifier:
   name: ansible
