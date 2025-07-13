@@ -1,9 +1,10 @@
+---
 # 各種情報の出力
 - name: Information
   ansible.builtin.command: "{{ item }}"
   with_items:
-    - 'hostname'
-    - 'uname -a'
+    - "hostname"
+    - "uname -a"
     - "docker --version"
     - "docker-compose --version"
     - "yum list installed"
