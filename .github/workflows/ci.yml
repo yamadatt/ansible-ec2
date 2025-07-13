@@ -32,7 +32,6 @@ jobs:
 
     - name: Syntax check
       run: |
-        cd ansible-ec2
         ansible-playbook --syntax-check site.yml
 
   molecule-test:
