@@ -4,11 +4,11 @@
   become: true
   tasks:
     - name: Include get_info role
-      include_role:
+      ansible.builtin.include_role:
         name: get_info
       tags: get_info
 
     - name: Include system role
-      include_role:
+      ansible.builtin.include_role:
         name: system
       tags: system
