@@ -1,5 +1,5 @@
 [targethost]
-18.179.118.82
+13.115.248.237
 
 [targethost:vars]
 ansible_ssh_port=22

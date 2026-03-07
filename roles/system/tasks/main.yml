@@ -56,6 +56,13 @@
     mode: "u+x,g+x,o+x"
   become: true
 
+# ec2-userでdockerコマンドを実行できるようにする
+- name: Add ec2-user to docker group
+  ansible.builtin.user:
+    name: ec2-user
+    groups: docker
+    append: yes
+
 # アプリをgit clone
 - name: Git clone
   ansible.builtin.git:
